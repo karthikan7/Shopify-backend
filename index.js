@@ -15,11 +15,12 @@ connectDB();
 const app = express();
 
 const corsOptions = {
-    origin: ['https://shopif-one.vercel.app/', 'http://localhost:3000'],
-  credentials:        true,
-  methods:            ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders:     ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200
+    origin: ['https://shopif-one.vercel.app', 'http://localhost:3000'],
+    //                                       ↑ NO SLASH!
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
