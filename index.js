@@ -14,41 +14,39 @@ connectDB();
 
 const app = express();
 
-/* ---------------- CORS ---------------- */
-
-const allowedOrigins = [
-  "https://shopfrontend-khaki.vercel.app",
-  "http://localhost:3000"
-];
-
+/* CORS CONFIG */
 const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(null, true); // allow for deployment stability
-    }
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+    origin: [
+        'https://shopfrontend-khaki.vercel.app',
+        'http://localhost:3000'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 };
 
+/* MIDDLEWARES */
 app.use(cors(corsOptions));
-
-/* IMPORTANT: handle preflight safely */
-app.options("*", cors(corsOptions));
-
-/* ---------------- MIDDLEWARE ---------------- */
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-/* ---------------- ROUTES ---------------- */
+/* FIX FOR OPTIONS REQUEST (Render-safe) */
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "https://shopfrontend-khaki.vercel.app");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
 
+    if (req.method === "OPTIONS") {
+        return res.sendStatus(200);
+    }
+
+    next();
+});
+
+/* ROUTES */
 app.get('/', (req, res) => {
-  res.send('Backend is running');
+    res.send('Backend is running');
 });
 
 app.use('/auth', userroute);
@@ -57,9 +55,9 @@ app.use('/order', orderroute);
 app.use('/payment', paymentroute);
 app.use('/analytics', Analytic);
 
-/* ---------------- SERVER ---------------- */
-
+/* SERVER */
 const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
