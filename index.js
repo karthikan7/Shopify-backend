@@ -15,7 +15,7 @@ connectDB();
 const app = express();
 
 const corsOptions = {
-    origin: ['https://shopif-one.vercel.app', 'http://localhost:3000'],
+    origin: ['https://shopfrontend-khaki.vercel.app', 'http://localhost:3000'],
     //                                       ↑ NO SLASH!
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
