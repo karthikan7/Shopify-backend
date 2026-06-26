@@ -1,7 +1,6 @@
 const Order = require('../model/order');
 const sendEmail = require('../utils/sendEmail');
 
-//store details in mongo db this is ordered details 
 const addOrderItems = async (req, res) => {
   try {
     const { items, totalAmount, address, paymentId } = req.body;
@@ -20,54 +19,23 @@ const addOrderItems = async (req, res) => {
 
     const createdOrder = await order.save();
 
-    const message = `
-      <h2>Order Confirmation</h2>
-      <p>Hello ${req.user.name},</p>
-      <p>Your order has been placed! Order ID: <strong>${createdOrder._id}</strong></p>
-      <p>Total Amount Paid: ₹${totalAmount.toFixed(2)}</p>
-      <p>Shipping to: ${address.street}, ${address.city}</p>
-      <p>Thank you for shopping with ShopNest!</p>
-    `;
+    // ✅ SEND EMAIL ASYNC (DO NOT BLOCK RESPONSE)
+    setImmediate(() => {
+      sendEmail({
+        email: req.user.email,
+        subject: 'ShopNest - Order Confirmation',
+        message: `
+          <h2>Order Confirmation</h2>
+          <p>Hello ${req.user.name},</p>
+          <p>Order ID: ${createdOrder._id}</p>
+          <p>Total: ₹${totalAmount.toFixed(2)}</p>
+        `
+      }).catch(err => console.error('Email error:', err));
+    });
 
-    await sendEmail({ email: req.user.email, subject: 'ShopNest - Order Confirmation', message });
+    return res.status(201).json(createdOrder);
 
-    res.status(201).json(createdOrder);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
-
-const getMyOrders = async (req, res) => {
-  try {
-    const orders = await Order.find({ userId: req.user._id });
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const getOrders = async (req, res) => {
-  try {
-    // FIX: was populate('userId', 'id name') — 'id' is not a real field.
-    // Use '_id name email' to get the correct MongoDB fields.
-    const orders = await Order.find({}).populate('userId', '_id name email');
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-const updateOrderStatus = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id);
-    if (!order) return res.status(404).json({ message: 'Order not found' });
-
-    order.status = req.body.status || order.status;
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-module.exports = { addOrderItems, getMyOrders, getOrders, updateOrderStatus };
