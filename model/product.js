@@ -1,7 +1,7 @@
 const mongoose=require('mongoose');
 
 const productSchema = new mongoose.Schema({
-    //create product id
+    
   name:
    { type: String, 
     required: true },
@@ -27,7 +27,7 @@ const productSchema = new mongoose.Schema({
   { type: Number,
      default: 0 }
 }, { timestamps: true });
-//admin will fill this and send to response
+
 const product=mongoose.model('Product', productSchema);
 
 module.exports = product;

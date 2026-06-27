@@ -28,29 +28,32 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    if (!req.file) {
+      return res.status(400).json({ message: "Image file is required" });
+    }
+
     let imageUrl = "";
 
-    if (req.file) {
-      // Upload buffer directly to cloudinary
-      const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: "shopnest-products" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        stream.end(req.file.buffer);
-      });
-      imageUrl = result.secure_url;
-    }
+    // Upload to Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        { folder: "shopnest-products" },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
+
+    imageUrl = result.secure_url;
 
     const product = await Product.create({
       name,
       description,
-      price:    Number(price),
+      price: Number(price),
       category,
-      stock:    Number(stock),
+      stock: Number(stock),
       imageUrl,
     });
 
@@ -68,22 +71,22 @@ const updateProduct = async (req, res) => {
 
     const { name, description, price, category, stock } = req.body;
 
-    if (name)        product.name        = name;
+    if (name) product.name = name;
     if (description) product.description = description;
-    if (price)       product.price       = Number(price);
-    if (category)    product.category    = category;
+    if (price) product.price = Number(price);
+    if (category) product.category = category;
     if (stock !== undefined) product.stock = Number(stock);
 
     if (req.file) {
       const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
+        const uploadStream = cloudinary.uploader.upload_stream(
           { folder: "shopnest-products" },
           (error, result) => {
             if (error) reject(error);
             else resolve(result);
           }
         );
-        stream.end(req.file.buffer);
+        uploadStream.end(req.file.buffer);
       });
       product.imageUrl = result.secure_url;
     }

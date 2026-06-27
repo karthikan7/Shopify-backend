@@ -1,7 +1,7 @@
 const Order = require('../model/order');
 const sendEmail = require('../utils/sendEmail');
 
-/* -------------------- CREATE ORDER -------------------- */
+
 const addOrderItems = async (req, res) => {
   try {
     const { items, totalAmount, address, paymentId } = req.body;
@@ -20,7 +20,7 @@ const addOrderItems = async (req, res) => {
 
     const createdOrder = await order.save();
 
-    // async email (non-blocking)
+    
     setImmediate(() => {
       sendEmail({
         email: req.user.email,
@@ -42,7 +42,7 @@ const addOrderItems = async (req, res) => {
   }
 };
 
-/* -------------------- GET USER ORDERS -------------------- */
+
 const getMyOrders = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.user._id })
@@ -54,7 +54,7 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-/* -------------------- GET ALL ORDERS (ADMIN) -------------------- */
+
 const getOrders = async (req, res) => {
   try {
     const orders = await Order.find({})
@@ -67,7 +67,7 @@ const getOrders = async (req, res) => {
   }
 };
 
-/* -------------------- UPDATE ORDER STATUS -------------------- */
+
 const updateOrderStatus = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -86,7 +86,7 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
-/* -------------------- EXPORT -------------------- */
+
 module.exports = {
   addOrderItems,
   getMyOrders,

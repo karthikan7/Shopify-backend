@@ -74,7 +74,7 @@ const loginuser = async (req, res) => {
         _id:   user._id,
         name:  user.name,
         email: user.email,
-        role:  user.role,   // <-- this must be here
+        role:  user.role,   
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
@@ -84,7 +84,7 @@ const loginuser = async (req, res) => {
   }
 };
 
-// FIX: actually clears the cookie so the session ends properly
+
 const logoutuser = (req, res) => {
   res.cookie('token', '', { ...cookieOptions, maxAge: 0 });
   res.json({ message: 'Logged out successfully' });
