@@ -46,7 +46,7 @@ const createProduct = async (req, res) => {
       uploadStream.end(req.file.buffer);
     });
 
-    imageUrl = result.secure_url;
+    imageUrl = result.secure_url;//result return by cloudinary
 
     const product = await Product.create({
       name,
